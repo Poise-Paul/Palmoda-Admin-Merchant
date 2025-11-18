@@ -10,14 +10,14 @@ function page() {
          </div>
          <div className='flex gap-3 items-center'>
         <button
-        className='bg-inherit border  border-black text-black py-[5px] px-[10px] w-fit text-xs'
+        className='bg-inherit border  border-black text-black py-[5px] px-2.5 w-fit text-xs'
         >Invite Vendor</button>
          <button
-        className='bg-inherit border border-black text-black py-[5px] px-[10px]
+        className='bg-inherit border border-black text-black py-[5px] px-2.5
          w-fit text-xs'
         >Export CSV</button>
         <button
-        className='bg-inherit border border-black text-black py-[5px] px-[10px]
+        className='bg-inherit border border-black text-black py-[5px] px-2.5
          w-fit text-xs'
         >Help</button>
         </div>
