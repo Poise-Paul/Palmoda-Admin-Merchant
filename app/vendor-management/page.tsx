@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import VendorList from "./VendorList";
 import { Vendor } from "../_lib/type";
 import { getVendors } from "../_lib/vendors";
+import ProtectedRoute from "../_components/ProtectedRoute";
 
 export default function Page() {
   const [vendors, setVendors] = useState<Vendor[]>([]);
@@ -12,57 +13,70 @@ export default function Page() {
   const [search, setSearch] = useState<string>("");
   const [businessType, setBusinessType] = useState<string>("Any");
   const [kyc, setKyc] = useState<string>("Any");
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchVendors = async () => {
+      setLoading(true);
       const res = await getVendors();
       if (res?.success) {
         const apiVendors: Vendor[] = res.data.data;
         setVendors(apiVendors);
         setFilteredVendors(apiVendors);
       }
+      setLoading(false)
     };
     fetchVendors();
   }, []);
 
   // FILTERING LOGIC
-  useEffect(() => {
-    let data = [...vendors];
+ const handleApplyFilters = () => {
+  let data = [...vendors];
 
-    // Search
-    if (search.trim()) {
-      const lower = search.toLowerCase();
-      data = data.filter(
-        v =>
-          v.business_name.toLowerCase().includes(lower) ||
-          v.contact_person_name.toLowerCase().includes(lower) ||
-          v.email.toLowerCase().includes(lower)
-      );
-    }
+  // Search
+  if (search.trim()) {
+    const lower = search.toLowerCase();
+    data = data.filter(
+      v =>
+        v.business_name.toLowerCase().includes(lower) ||
+        v.contact_person_name.toLowerCase().includes(lower) ||
+        v.email.toLowerCase().includes(lower)
+    );
+  }
 
-    // Business type
-    if (businessType !== "Any") {
-      data = data.filter(v => v.businessType === businessType);
-    }
+  // Business type
+  if (businessType !== "Any") {
+    data = data.filter(v => v.kyc_compliance.business_type === businessType);
+  }
 
-    // KYC status
-    if (kyc !== "Any") {
-  data = data.filter(v => {
-    const isVerified =
-      v.is_business_verified &&
-      v.is_identity_verified &&
-      v.is_bank_information_verified;
+  // KYC status
+  if (kyc !== "Any") {
+    data = data.filter(v => {
+      const isVerified =
+        v.is_business_verified &&
+        v.is_identity_verified &&
+        v.is_bank_information_verified;
 
-    return kyc === "Verified" ? isVerified : !isVerified;
-  });
-}
+      if (kyc === "Verified") return isVerified;
+      if (kyc === "Unverified") return !isVerified;
+      if (kyc === "Pending") {
+        return (
+          !v.is_business_verified ||
+          !v.is_identity_verified ||
+          !v.is_bank_information_verified
+        );
+      }
+      return true;
+    });
+  }
 
+  setFilteredVendors(data);
+};
 
-    setFilteredVendors(data);
-  }, [search, businessType, kyc, vendors]);
 
   return (
-    <section className="bg-white min-h-screen px-4 md:px-8 py-6 w-full">
+    <ProtectedRoute>
+      <section className="bg-white min-h-screen px-4 md:px-8 py-6 w-full">
       <div className="flex items-center justify-between">
         <h1 className="text-black font-bold text-xl">Vendor List</h1>
 
@@ -87,7 +101,10 @@ export default function Page() {
         setBusinessType={setBusinessType}
         kyc={kyc}
         setKyc={setKyc}
+         loading={loading} 
+          onApplyFilters={handleApplyFilters}
       />
     </section>
+    </ProtectedRoute>
   );
 }

@@ -1,26 +1,18 @@
-import React from 'react'
+"use client";
+import React, { useEffect, useState } from 'react'
 import Products from './Products'
+import ProtectedRoute from '../_components/ProtectedRoute'
+import {fetchProducts} from "../_lib/products"
+
 
 function page() {
+    
+
   return (
-    <section className='bg-gray-100 min-h-screen px-4  md:px-8 py-6 w-full'>
-      <div className='flex items-center justify-between'>
-         <div>
-          <h1 className='text-black font-bold text-xl'>Product Submission Review</h1>
-          <p className='text-gray-500 text-xs'>Review and approve product submissions from vendors</p>
-         </div>
-         <div className='flex gap-3 items-center'>
-        <button
-        className='bg-inherit border  border-black text-black py-[5px] px-2.5 w-fit text-xs'
-        >Filter Status</button>
-         <button
-        className='bg-inherit border border-black text-black py-[5px] px-2.5
-         w-fit text-xs'
-        >Sort Date</button>
-        </div>
-      </div>
-      <Products />
-    </section>
+    <ProtectedRoute>
+      <section className='bg-gray-100 min-h-screen px-4  md:px-8 py-6 w-full'>
+     </section>
+    </ProtectedRoute>
   )
 }
 

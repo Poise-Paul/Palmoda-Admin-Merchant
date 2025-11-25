@@ -25,7 +25,7 @@ function page() {
       <DashboardGrid />
       <DashboardStatsGrid />
       <VendorsSection />
-    </section>\
+    </section>
     </ProtectedRoute>
   )
 }

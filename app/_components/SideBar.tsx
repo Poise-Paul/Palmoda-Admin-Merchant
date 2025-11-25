@@ -11,9 +11,11 @@ import { MdOutlineRateReview } from "react-icons/md";
 import { usePathname } from "next/navigation";
 import { IoMdInformationCircle } from "react-icons/io";
 import { BsGraphUp } from "react-icons/bs";
+import { useAuth } from "../_lib/AuthContext";
 
 function Sidebar() {
   const pathname = usePathname();
+  const {logout} = useAuth();
 
   // Hide sidebar on login page
   if (pathname.includes("login")) {
@@ -21,8 +23,8 @@ function Sidebar() {
   }
 
   const links = [
-    { href: "/application-review", label: "Application Review", icon: <FiUserCheck /> },
-    { href: "/product-review-queue", label: "Product Review Queue", icon: <MdOutlineRateReview /> },
+    // { href: "/application-review", label: "Application Review", icon: <FiUserCheck /> },
+    // { href: "/product-review-queue", label: "Product Review Queue", icon: <MdOutlineRateReview /> },
     { href: "/vendor-management", label: "Vendor Management", icon: <FiUsers /> },
     { href: "/", label: "Analytics", icon: <BsGraphUp /> },
     { href: "/settings", label: "Settings", icon: <FiSettings /> },
@@ -68,12 +70,12 @@ function Sidebar() {
             </p>
           </div>
 
-          <Link
-            href="/login"
+          <h4
+            onClick={logout}
             className="flex items-center gap-3 text-red-500 hover:text-red-700"
           >
             <FiLogOut /> Logout
-          </Link>
+          </h4>
         </div>
       </nav>
     </aside>
