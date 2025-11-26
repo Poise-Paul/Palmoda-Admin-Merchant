@@ -14,20 +14,25 @@ export default function Page() {
   const [businessType, setBusinessType] = useState<string>("Any");
   const [kyc, setKyc] = useState<string>("Any");
   const [loading, setLoading] = useState<boolean>(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const fetchVendors = async (page = 1) => {
+    setLoading(true);
+    const res = await getVendors(page);
+
+    if (res?.success) {
+      setVendors(res.data.data);
+      setFilteredVendors(res.data.data);
+      setTotalPages(res.data.total_pages || 1); // backend returns total_pages?
+    }
+
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchVendors = async () => {
-      setLoading(true);
-      const res = await getVendors();
-      if (res?.success) {
-        const apiVendors: Vendor[] = res.data.data;
-        setVendors(apiVendors);
-        setFilteredVendors(apiVendors);
-      }
-      setLoading(false)
-    };
-    fetchVendors();
-  }, []);
+    fetchVendors(currentPage);
+  }, [currentPage]);
 
   // FILTERING LOGIC
  const handleApplyFilters = () => {
@@ -103,6 +108,9 @@ export default function Page() {
         setKyc={setKyc}
          loading={loading} 
           onApplyFilters={handleApplyFilters}
+           currentPage={currentPage}
+  totalPages={totalPages}
+  onPageChange={(page) => setCurrentPage(page)}
       />
     </section>
     </ProtectedRoute>

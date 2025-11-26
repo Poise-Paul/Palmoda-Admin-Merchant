@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Vendor } from "../_lib/type";
+import React from "react";
 
 interface VendorListProps {
   vendors: Vendor[];
@@ -11,6 +12,7 @@ interface VendorListProps {
   setKyc: React.Dispatch<React.SetStateAction<string>>;
   loading: boolean;
   onApplyFilters: () => void;
+  onPageChange: (page: number) => void;
 }
 
 export default function VendorList({
@@ -25,7 +27,17 @@ export default function VendorList({
   onApplyFilters
 }: VendorListProps) {
 
+  const [currentPage, setCurrentPage] = React.useState(1);
+const pageSize = 7;
+
+
+
   const skeletonRows: undefined[] = Array(6);
+  const totalPages = Math.ceil(vendors.length / pageSize);
+const paginatedVendors = vendors.slice(
+  (currentPage - 1) * pageSize,
+  currentPage * pageSize
+);
 
   return (
     <section className="bg-white text-gray-800 w-full mt-6">
@@ -164,7 +176,7 @@ export default function VendorList({
                   </tr>
                 ))
                 : 
-              vendors.map((vendor) => (
+              paginatedVendors.map((vendor) => (
                 <tr key={vendor._id} className="border-b border-gray-100 hover:bg-gray-50 transition">
 
                   <td className="py-3 px-4">{vendor.business_name}</td>
@@ -202,8 +214,36 @@ export default function VendorList({
                 </tr>
               ))}
             </tbody>
-
+           
           </table>
+          {/* Pagination */}
+<div className="flex justify-between items-center p-4  bg-white">
+  <button
+  disabled={currentPage === 1}
+  onClick={() => onPageChange(currentPage - 1)}
+  className={`px-4 py-2 text-sm border rounded
+    ${currentPage === 1 ? "opacity-40 cursor-not-allowed" : "hover:bg-gray-100"}
+  `}
+>
+  Previous
+</button>
+
+<p className="text-sm">Page {currentPage} of {totalPages}</p>
+
+<button
+  disabled={currentPage === totalPages}
+  onClick={() => onPageChange(currentPage + 1)}
+  className={`px-4 py-2 text-sm border rounded
+    ${currentPage === totalPages
+      ? "opacity-40 cursor-not-allowed"
+      : "hover:bg-gray-100"}
+  `}
+>
+  Next
+</button>
+
+</div>
+
         </div>
 
       </div>
