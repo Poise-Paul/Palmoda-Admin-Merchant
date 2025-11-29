@@ -112,3 +112,13 @@ export interface TransactionType {
   updated_at: string;
   vendor: Vendor;
 }
+
+export interface VendorMessage {
+  _id: string;
+  vendor_id: string;
+  title: string;
+  content: string;
+  message_type: "text";
+  created_at: string;
+  updated_at: string;
+}

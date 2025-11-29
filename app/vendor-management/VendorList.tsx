@@ -277,9 +277,9 @@ export default function VendorList({
                         <button className="px-3 py-1 border text-black bg-inherit text-xs">
                           Suspend
                         </button>
-                        <button className="px-3 py-1 border text-black bg-inherit text-xs">
+                        <Link href={`/application-review/${vendor?._id}#mesage`} className="px-3 py-1 border text-black bg-inherit text-xs">
                           Message
-                        </button>
+                        </Link>
                       </td>
                     </tr>
                   ))}
