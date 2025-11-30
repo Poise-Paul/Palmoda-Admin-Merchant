@@ -88,7 +88,7 @@ export default function Page() {
         <div className="flex items-center justify-between">
           <h1 className="text-black font-bold text-xl">Vendor List</h1>
 
-          <div className="flex gap-3 items-center">
+          {/* {/* <div className="flex gap-3 items-center">
             <button className="border border-black text-black py-[5px] px-2.5 text-xs">
               Invite Vendor
             </button>
@@ -98,8 +98,9 @@ export default function Page() {
             <button className="border border-black text-black py-[5px] px-2.5 text-xs">
               Help
             </button>
+          // </div> */}
           </div>
-        </div>
+       
 
         <VendorList
           vendors={filteredVendors}

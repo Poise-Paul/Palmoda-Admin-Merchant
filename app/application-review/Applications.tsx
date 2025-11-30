@@ -326,9 +326,10 @@ const handleMessage = async () => {
 ))}
     
                 </div>
-                <Link href={`/product-review-queue/${id}`} className='
+                {products.length > 0 && <Link href={`/product-review-queue/${id}`} className='
     text-xs font-semibold p-3 border -mt-5 mb-10 border-gray-200
-    '>View All Products</Link>
+    '>View All Products</Link>}
+                
                 <div className='mt-6'>
                   <h1 className='text-gray-500  text-sm mb-2'>Product Information</h1>
                   <div className='flex gap-2.5 text-gray-500  text-xs'>

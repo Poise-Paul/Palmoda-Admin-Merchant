@@ -6,7 +6,7 @@ import { getAllTransactions } from "../_lib/payouts";
 import { CiUser } from "react-icons/ci";
 import Link from "next/link";
 
-const PAGE_SIZE = 10; // Number of rows per page
+const PAGE_SIZE = 5; // Number of rows per page
 
 function page() {
   const [loading, setLoading] = useState(false);
