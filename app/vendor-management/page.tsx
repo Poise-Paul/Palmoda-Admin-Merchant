@@ -89,15 +89,15 @@ export default function Page() {
           <h1 className="text-black font-bold text-xl">Vendor List</h1>
 
           <div className="flex gap-3 items-center">
-            <button className="border border-black text-black py-[5px] px-2.5 text-xs">
+            <button  className="border border-black text-black py-[5px] px-2.5 text-xs">
               Invite Vendor
             </button>
             <button className="border border-black text-black py-[5px] px-2.5 text-xs">
               Export CSV
             </button>
-            <button className="border border-black text-black py-[5px] px-2.5 text-xs">
+            {/* <button className="border border-black text-black py-[5px] px-2.5 text-xs">
               Help
-            </button>
+            </button> */}
           </div>
         </div>
 

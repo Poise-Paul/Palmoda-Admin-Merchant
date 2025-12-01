@@ -12,6 +12,7 @@ import { usePathname } from "next/navigation";
 import { IoMdInformationCircle } from "react-icons/io";
 import { BsGraphUp } from "react-icons/bs";
 import { useAuth } from "../_lib/AuthContext";
+import { FaMoneyBills } from "react-icons/fa6";
 
 function Sidebar() {
   const pathname = usePathname();
@@ -24,8 +25,12 @@ function Sidebar() {
 
   const links = [
     // { href: "/application-review", label: "Application Review", icon: <FiUserCheck /> },
-    // { href: "/product-review-queue", label: "Product Review Queue", icon: <MdOutlineRateReview /> },
-    { href: "/vendor-management", label: "Vendor Management", icon: <FiUsers /> },
+    { href: "/payouts", label: "Payouts", icon: <FaMoneyBills /> },
+    {
+      href: "/vendor-management",
+      label: "Vendor Management",
+      icon: <FiUsers />,
+    },
     { href: "/", label: "Analytics", icon: <BsGraphUp /> },
     { href: "/settings", label: "Settings", icon: <FiSettings /> },
   ];
