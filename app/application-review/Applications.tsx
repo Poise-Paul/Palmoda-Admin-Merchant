@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import Link from 'next/link'
 import {getAllVendorMessages, sendMessage} from "../_lib/message"
 import { useRouter } from 'next/navigation'
+import { FaArrowLeft } from 'react-icons/fa'
 
 
 
@@ -218,6 +219,13 @@ const handleMessage = async () => {
 
   return (
     <section>
+      <button
+        onClick={() => router.back()}
+        className="text-xs flex items-center mt-6 gap-1 cursor-pointer text-gray-600 mb-5  hover:text-gray-800"
+      >
+        <FaArrowLeft />  
+        <span>Back to Vendor Applications</span>
+      </button>
       {/* begining of application */}
       <div className='border my-5 border-gray-200'>
         <div className='flex items-center justify-between px-3 py-2'>
