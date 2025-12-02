@@ -226,12 +226,12 @@ export default function VendorList({
             className="border border-gray-300 rounded-md px-3 py-2 w-full text-sm"
           />
 
-          <label className="text-xs font-medium text-gray-600">Country</label>
+          {/* <label className="text-xs font-medium text-gray-600">Country</label>
           <select className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-black/20">
             <option>Any</option>
             <option>Nigeria</option>
             <option>Ghana</option>
-          </select>
+          </select> */}
 
           <label className="text-xs font-medium text-gray-600">Kyc Status</label>
           <select
@@ -245,23 +245,23 @@ export default function VendorList({
             <option value="Unverified">Unverified</option>
           </select>
 
-          <label className="text-xs font-medium text-gray-600">Document Missing</label>
+          {/* <label className="text-xs font-medium text-gray-600">Document Missing</label>
           <select className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-black/20">
             <option>Any</option>
             <option>Yes</option>
             <option>No</option>
-          </select>
+          </select> */}
 
-          <label className="text-xs font-medium text-gray-600">Onboarding Age</label>
+          {/* <label className="text-xs font-medium text-gray-600">Onboarding Age</label>
           <select className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-black/20">
             <option>Any</option>
             <option>0–3 months</option>
             <option>3–6 months</option>
             <option>6–12 months</option>
             <option>1+ years</option>
-          </select>
+          </select> */}
 
-          <label className="text-xs font-medium text-gray-600">Last Activity</label>
+          {/* <label className="text-xs font-medium text-gray-600">Last Activity</label>
           <select className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-black/20">
             <option>Any</option>
             <option>Today</option>
@@ -269,9 +269,9 @@ export default function VendorList({
             <option>This month</option>
             <option>1–3 months ago</option>
             <option>3+ months ago</option>
-          </select>
+          </select> */}
 
-          <div className="flex flex-col gap-2">
+          {/* <div className="flex flex-col gap-2">
             <label className="text-xs font-medium text-gray-600">Revenue Range</label>
             <div className="flex items-center gap-2">
               <input
@@ -286,9 +286,9 @@ export default function VendorList({
                 className="border border-gray-300 rounded-md px-3 py-2 w-full text-sm focus:ring-2 focus:ring-black/20"
               />
             </div>
-          </div>
+          </div> */}
 
-          <div className="flex flex-col gap-2 mt-2">
+          {/* <div className="flex flex-col gap-2 mt-2">
             <label className="text-xs font-medium text-gray-600">More Filters</label>
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" className="accent-black" />
@@ -302,7 +302,7 @@ export default function VendorList({
               <input type="checkbox" className="accent-black" />
               Inventory Low
             </label>
-          </div>
+          </div> */}
 
           <div className="flex gap-4 justify-center mt-4">
             <button
