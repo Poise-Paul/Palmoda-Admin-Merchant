@@ -106,7 +106,7 @@ function Page() {
         </div>
       </div>
 
-     <Applications vendor={vendor} id={vendorId} products={products || []} />
+     <Applications vendor={vendor} id={vendorId} products={products || []} setVendor={setVendor}/>
     </section>
     </ProtectedRoute>
   );
