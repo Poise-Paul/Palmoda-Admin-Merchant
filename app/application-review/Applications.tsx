@@ -16,10 +16,11 @@ interface ApplicationsProps {
   vendor: Vendor | null;
   id: string;
   products: Product[];
+  setVendor: React.Dispatch<React.SetStateAction<Vendor | null>>;
 }
 
 
-function Applications({ vendor, id, products }: ApplicationsProps) {
+function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
   const [selectedDoc, setSelectedDoc] = useState<string | null>(null);
   
   // --- NEW SEPARATE LOADING STATES ---
@@ -161,8 +162,8 @@ const handleVerifyBusiness = async () => {
     try {
         const res = await verifyBusiness(id);
         toast.success(res.message || "Business verified successfully!");
-        // Note: In a real app, you would dispatch an action or manually update the vendor object
-        // to reflect vendor.is_business_verified = true and re-calculate progress.
+        // ✅ Update state immediately
+        setVendor((prev) => prev ? { ...prev, is_business_verified: true } : prev);
     } catch (error: any) {
         toast.error(error.message || "Failed to verify Business");
     } finally {
@@ -176,6 +177,8 @@ const handleVerifyIdentity = async () => {
     try {
         const res = await verifyVendorIdentity(id);
         toast.success(res.message || "Identity verified successfully!");
+        // ✅ Update state immediately
+        setVendor((prev) => prev ? { ...prev, is_identity_verified: true } : prev);
     } catch (error: any) {
         toast.error(error.message || "Failed to verify Identity");
     } finally {
@@ -189,6 +192,8 @@ const handleVerifyBankDetails = async () => {
     try {
         const res = await verifyBankDetails(id);
         toast.success(res.message || "Bank Details verified successfully!");
+        // ✅ Update state immediately
+        setVendor((prev) => prev ? { ...prev, is_bank_information_verified: true } : prev);
     } catch (error: any) {
         toast.error(error.message || "Failed to verify Bank Details");
     } finally {

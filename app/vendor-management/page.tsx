@@ -32,6 +32,17 @@ export default function Page() {
     setLoading(false);
   };
 
+   const updateVendorStatus = (vendorId: string, isSuspended: boolean) => {
+  setVendors(prev =>
+    prev.map(v => v._id === vendorId ? { ...v, is_suspended: isSuspended, is_active: !isSuspended } : v)
+  );
+
+  setFilteredVendors(prev =>
+    prev.map(v => v._id === vendorId ? { ...v, is_suspended: isSuspended, is_active: !isSuspended } : v)
+  );
+};
+
+
   useEffect(() => {
     fetchVendors(currentPage);
   }, [currentPage]);
@@ -104,6 +115,7 @@ export default function Page() {
 
         <VendorList
           vendors={filteredVendors}
+          setVendors={setVendors}
           search={search}
           setSearch={setSearch}
           businessType={businessType}
@@ -115,6 +127,7 @@ export default function Page() {
           currentPage={currentPage}
           totalVendors={totalPages}
           onPageChange={(page) => setCurrentPage(page)}
+          updateVendorStatus={updateVendorStatus}
         />
       </section>
     </ProtectedRoute>
