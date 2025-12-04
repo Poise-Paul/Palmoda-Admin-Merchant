@@ -31,6 +31,7 @@ function Products({ vendor, id, products: initialProducts }: ProductProps) {
   const [sizes, setSizes] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>("");
+  const [mainImage, setMainImage] = useState<string | null>(null);
   const [gender, setGender] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [rejecting, setRejecting] = useState(false);
@@ -45,6 +46,13 @@ function Products({ vendor, id, products: initialProducts }: ProductProps) {
   useEffect(() => {
     setProductQueue(initialProducts);
   }, [initialProducts]);
+
+  useEffect(() => {
+  if (initialProducts.length > 0) {
+    setMainImage(initialProducts[0].images[0]);
+  }
+}, [initialProducts]);
+
 
   const [queryParams, setQueryParams] = useState<CategoryQueryParams>({
     page_number: 1,
@@ -229,21 +237,24 @@ function Products({ vendor, id, products: initialProducts }: ProductProps) {
           <div className="flex gap-7">
             {/* Images */}
             <div className="flex flex-col gap-6 w-[250px]">
-              <img
-                src={item.images[0]}
-                alt="Main Product"
-                className="w-full h-[300px] object-cover rounded-md"
-              />
-              <div className="flex gap-1">
-                {item.images.slice(1).map((img, idx) => (
-                  <img
-                    key={idx}
-                    src={img}
-                    alt={`Thumbnail ${idx + 1}`}
-                    className="w-1/4 h-[50px] object-cover rounded-sm cursor-pointer hover:scale-105 transition-transform"
-                  />
-                ))}
-              </div>
+             <img
+  src={mainImage || item.images[0]}
+  alt="Main Product"
+  className="w-full h-[300px] object-cover rounded-md"
+/>
+
+             <div className="flex gap-1">
+  {item.images.slice(1).map((img, idx) => (
+    <img
+      key={idx}
+      src={img}
+      alt={`Thumbnail ${idx + 1}`}
+      className="w-1/4 h-[50px] object-cover rounded-sm cursor-pointer hover:scale-105 transition-transform"
+      onClick={() => setMainImage(img)} // ✅ Set main image on click
+    />
+  ))}
+</div>
+
             </div>
 
             {/* Description */}
