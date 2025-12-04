@@ -92,7 +92,7 @@ const DeclineModal: React.FC<DeclineModalProps> = ({
         <p className="text-orange-500 text-xs mb-3">⚠️ This action cannot be undone.</p>
 
         <label className="text-xs text-gray-500">Decline Reason*</label>
-        <select
+        {/* <select
           className="w-full border p-2 rounded text-xs mt-1"
           value={reason}
           onChange={(e) => setReason(e.target.value)}
@@ -101,7 +101,7 @@ const DeclineModal: React.FC<DeclineModalProps> = ({
           <option value="Invalid documents">Invalid documents</option>
           <option value="Suspicious activity">Suspicious activity</option>
           <option value="Incorrect payout details">Incorrect payout details</option>
-        </select>
+        </select> */}
 
         <label className="text-xs text-gray-500 mt-3 block">Additional Details*</label>
         <textarea
