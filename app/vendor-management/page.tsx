@@ -2,138 +2,120 @@
 import React, { useEffect, useState } from "react";
 import VendorList from "./VendorList";
 import { Vendor } from "../_lib/type";
-import { getVendors } from "../_lib/vendors";
 import ProtectedRoute from "../_components/ProtectedRoute";
+import { 
+  useVendors,
+  useSuspendVendor,
+  useRevokeSuspension 
+} from "../_lib/useVendors";
 
 export default function Page() {
-  const [vendors, setVendors] = useState<Vendor[]>([]);
-  const [filteredVendors, setFilteredVendors] = useState<Vendor[]>([]);
-
-  // FILTER STATES
-  const [search, setSearch] = useState<string>("");
-  const [businessType, setBusinessType] = useState<string>("Any");
-  const [kyc, setKyc] = useState<string>("Any");
-  const [loading, setLoading] = useState<boolean>(true);
+  // Filters + Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [search, setSearch] = useState("");
+  const [businessType, setBusinessType] = useState("Any");
+  const [kyc, setKyc] = useState("Any");
 
-  const fetchVendors = async (page = 1) => {
-    setLoading(true);
-    const res = await getVendors(page);
+  // React Query Data
+  const { data, isLoading, isError } = useVendors(currentPage);
+  const vendors = data?.vendors || [];
+  const totalPages = data?.totalPages || 1;
 
-    console.log("Current-Page===>>", page);
-    console.log("Response>>>", res);
-    if (res?.success) {
-      setVendors(res.data.data);
-      setFilteredVendors(res.data.data);
-      setTotalPages(res.data.total_vendors || 1); // backend returns total_pages?
-    }
-
-    setLoading(false);
-  };
-
-   const updateVendorStatus = (vendorId: string, isSuspended: boolean) => {
-  setVendors(prev =>
-    prev.map(v => v._id === vendorId ? { ...v, is_suspended: isSuspended, is_active: !isSuspended } : v)
-  );
-
-  setFilteredVendors(prev =>
-    prev.map(v => v._id === vendorId ? { ...v, is_suspended: isSuspended, is_active: !isSuspended } : v)
-  );
-};
-
+  // Filtered Vendors
+  const [filteredVendors, setFilteredVendors] = useState<Vendor[]>(vendors);
 
   useEffect(() => {
-    fetchVendors(currentPage);
-  }, [currentPage]);
+    setFilteredVendors(vendors);
+  }, [vendors]);
 
-  // FILTERING LOGIC
- const handleApplyFilters = (overrides?: { search?: string; businessType?: string; kyc?: string }) => {
-  let data = [...vendors];
+  // FILTER LOGIC
+  const handleApplyFilters = (overrides?: {
+    search?: string;
+    businessType?: string;
+    kyc?: string;
+  }) => {
+    let dataToFilter = [...vendors];
 
-  const currentSearch = overrides?.search ?? search;
-  const currentBusinessType = overrides?.businessType ?? businessType;
-  const currentKyc = overrides?.kyc ?? kyc;
+    const s = overrides?.search ?? search;
+    const bt = overrides?.businessType ?? businessType;
+    const k = overrides?.kyc ?? kyc;
 
-  // Apply search
-  if (currentSearch.trim()) {
-    const lower = currentSearch.toLowerCase();
-    data = data.filter(
-      (v) =>
-        v.business_name.toLowerCase().includes(lower) ||
-        v.contact_person_name.toLowerCase().includes(lower) ||
-        v.email.toLowerCase().includes(lower)
-    );
-  }
+    // Search Filter
+    if (s.trim()) {
+      const lower = s.toLowerCase();
+      dataToFilter = dataToFilter.filter(
+        (v) =>
+          v.business_name.toLowerCase().includes(lower) ||
+          v.contact_person_name.toLowerCase().includes(lower) ||
+          v.email.toLowerCase().includes(lower)
+      );
+    }
 
-  // Business type
-  if (currentBusinessType !== "Any") {
-    data = data.filter(
-      (v) => v.kyc_compliance.business_type === currentBusinessType
-    );
-  }
+    // Business Type Filter
+    if (bt !== "Any") {
+      dataToFilter = dataToFilter.filter(
+        (v) => v.kyc_compliance.business_type === bt
+      );
+    }
 
-  // KYC
-  if (currentKyc !== "Any") {
-    data = data.filter((v) => {
-      const isVerified =
-        v.is_business_verified &&
-        v.is_identity_verified &&
-        v.is_bank_information_verified;
+    // KYC Filter
+    if (k !== "Any") {
+      dataToFilter = dataToFilter.filter((v) => {
+        const verified =
+          v.is_business_verified &&
+          v.is_identity_verified &&
+          v.is_bank_information_verified;
 
-      if (currentKyc === "Verified") return isVerified;
-      if (currentKyc === "Unverified") return !isVerified;
-      if (currentKyc === "Pending") {
-        return (
-          !v.is_business_verified ||
-          !v.is_identity_verified ||
-          !v.is_bank_information_verified
-        );
-      }
-      return true;
-    });
-  }
+        if (k === "Verified") return verified;
+        if (k === "Unverified") return !verified;
+        if (k === "Pending") {
+          return (
+            !v.is_business_verified ||
+            !v.is_identity_verified ||
+            !v.is_bank_information_verified
+          );
+        }
+      });
+    }
 
-  setFilteredVendors(data);
-};
+    setFilteredVendors(dataToFilter);
+  };
 
+  // Mutations
+  const suspendMutation = useSuspendVendor();
+  const revokeMutation = useRevokeSuspension();
+
+  const handleSuspend = (vendorId: string) => {
+    suspendMutation.mutate(vendorId);
+  };
+
+  const handleRevoke = (vendorId: string) => {
+    revokeMutation.mutate(vendorId);
+  };
 
   return (
     <ProtectedRoute>
       <section className="bg-white min-h-screen px-4 md:px-8 py-6 w-full">
         <div className="flex items-center justify-between">
           <h1 className="text-black font-bold text-xl">Vendor List</h1>
-
-          {/* {/* <div className="flex gap-3 items-center">
-            <button className="border border-black text-black py-[5px] px-2.5 text-xs">
-              Invite Vendor
-            </button>
-            <button className="border border-black text-black py-[5px] px-2.5 text-xs">
-              Export CSV
-            </button>
-            <button className="border border-black text-black py-[5px] px-2.5 text-xs">
-              Help
-            </button>
-          // </div> */}
-          </div>
-       
+        </div>
 
         <VendorList
           vendors={filteredVendors}
-          setVendors={setVendors}
+          setFilteredVendors={setFilteredVendors}
           search={search}
           setSearch={setSearch}
           businessType={businessType}
           setBusinessType={setBusinessType}
           kyc={kyc}
           setKyc={setKyc}
-          loading={loading}
+          loading={isLoading}
           onApplyFilters={handleApplyFilters}
           currentPage={currentPage}
           totalVendors={totalPages}
-           setFilteredVendors={setFilteredVendors}
           onPageChange={(page) => setCurrentPage(page)}
-          updateVendorStatus={updateVendorStatus}
+          onSuspend={handleSuspend}
+          onRevoke={handleRevoke}
         />
       </section>
     </ProtectedRoute>

@@ -9,25 +9,28 @@ import Swal from "sweetalert2";
 
 interface VendorListProps {
   vendors: Vendor[];
-  setVendors: React.Dispatch<React.SetStateAction<Vendor[]>>;
-    setFilteredVendors: React.Dispatch<React.SetStateAction<Vendor[]>>; 
+  setFilteredVendors: React.Dispatch<React.SetStateAction<Vendor[]>>;
   search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
   businessType: string;
   setBusinessType: React.Dispatch<React.SetStateAction<string>>;
   kyc: string;
-  updateVendorStatus: (vendorId: string, isSuspended: boolean) => void;
   setKyc: React.Dispatch<React.SetStateAction<string>>;
+  
   loading: boolean;
   onApplyFilters: () => void;
+
   currentPage: number;
   totalVendors: number;
   onPageChange: (page: number) => void;
+
+  onSuspend: (vendorId: string) => void;
+  onRevoke: (vendorId: string) => void;
 }
+
 
 export default function VendorList({
   vendors,
-  setVendors,
   setFilteredVendors,
   search,
   setSearch,
@@ -40,7 +43,8 @@ export default function VendorList({
   totalVendors,
   currentPage,
   onApplyFilters,
-  updateVendorStatus,
+  onSuspend,
+  onRevoke,
 }: VendorListProps) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -91,37 +95,17 @@ export default function VendorList({
 const handleSuspendVendor = async (vendorId: string, vendorName: string) => {
   const result = await Swal.fire({
     title: "Suspend Vendor?",
-    text: `Are you sure you want to suspend ${vendorName}? This action can be reversed later.`,
+    text: `Suspend ${vendorName}?`,
     icon: "warning",
     showCancelButton: true,
-    confirmButtonColor: "#000000",
-    cancelButtonColor: "#6b7280",
-    confirmButtonText: "Yes, suspend",
-    cancelButtonText: "Cancel",
+    confirmButtonColor: "#000",
   });
 
   if (result.isConfirmed) {
-    try {
-      setSuspendingVendors((prev) => ({ ...prev, [vendorId]: true }));
-      const res = await suspendVendor(vendorId);
-
-      if (res?.success === false) {
-        toast.error(res.message || "Failed to suspend vendor");
-      } else {
-        toast.success("Vendor suspended successfully!");
-        setVendors((prev) =>
-          prev.map((v) =>
-            v._id === vendorId ? { ...v, is_suspended: true, is_active: false } : v
-          )
-        );
-      }
-    } catch (error: any) {
-      toast.error(error.message || "Failed to suspend vendor");
-    } finally {
-      setSuspendingVendors((prev) => ({ ...prev, [vendorId]: false }));
-    }
+    onSuspend(vendorId); // ⭐ TRIGGER REACT QUERY MUTATION
   }
 };
+
 
 // Revoke suspension
 const handleRevoke = async (vendorId: string, vendorName: string) => {
@@ -137,25 +121,7 @@ const handleRevoke = async (vendorId: string, vendorName: string) => {
   });
 
   if (result.isConfirmed) {
-    try {
-      setSuspendingVendors((prev) => ({ ...prev, [vendorId]: true }));
-      const res = await revokeSuspension(vendorId);
-
-      if (res?.success === false) {
-        toast.error(res.message || "Failed to revoke suspension");
-      } else {
-        toast.success("Vendor Suspension Revoked");
-        setVendors((prev) =>
-          prev.map((v) =>
-            v._id === vendorId ? { ...v, is_suspended: false, is_active: true } : v
-          )
-        );
-      }
-    } catch (error: any) {
-      toast.error(error.message || "Failed to revoke suspension");
-    } finally {
-      setSuspendingVendors((prev) => ({ ...prev, [vendorId]: false }));
-    }
+     onRevoke(vendorId)
   }
 };
 
@@ -425,8 +391,7 @@ const handleRevoke = async (vendorId: string, vendorName: string) => {
                               </Link>
                              {!vendor.is_suspended && (
   <button
-    onClick={() => handleSuspendVendor(vendor._id, vendor.business_name)
-      .then(() => updateVendorStatus(vendor._id, true))}
+    onClick={() => handleSuspendVendor(vendor._id, vendor.business_name)}
     disabled={suspendingVendors[vendor._id]}
     className="px-3 py-1 border text-black bg-inherit text-xs hover:bg-gray-100 disabled:opacity-50"
   >
@@ -436,8 +401,7 @@ const handleRevoke = async (vendorId: string, vendorName: string) => {
 
 {vendor.is_suspended && (
   <button
-    onClick={() => handleRevoke(vendor._id, vendor.business_name)
-  .then(() => updateVendorStatus(vendor._id, false))}
+    onClick={() => handleRevoke(vendor._id, vendor.business_name)}
     disabled={suspendingVendors[vendor._id]}
     className="px-3 py-1 border text-black bg-inherit text-xs hover:bg-gray-100 disabled:opacity-50"
   >

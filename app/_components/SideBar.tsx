@@ -15,14 +15,19 @@ import { BsGraphUp } from "react-icons/bs";
 import { useAuth } from "../_lib/AuthContext";
 import type { Notification as MyNotification } from "../_lib/type";
 import { getNotifications, notificationCount, readNotification } from "../_lib/notification";
+import { useNotificationCount } from "../_lib/useNotifications";
 
 function Sidebar() {
   const pathname = usePathname();
-  const [notifications, setNotifications] = useState<MyNotification[]>([]);
-  const [count, setCount] = useState(0);
+  // const [notifications, setNotifications] = useState<MyNotification[]>([]);
+  // const [count, setCount] = useState(0);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { data: countData } = useNotificationCount();
   const {logout} = useAuth();
+  const count = countData?.data?.count || 0;
+
+  
 
  useEffect(() => {
   const storedToken = localStorage.getItem("token");
@@ -33,38 +38,38 @@ function Sidebar() {
 
   setToken(storedToken);   // set token
 
-  const fetchNotifications = async () => {
-    setLoading(true);
-    try {
-      const res = await getNotifications();
-      console.log("Notifications response:", res);
+  // const fetchNotifications = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const res = await getNotifications();
+  //     console.log("Notifications response:", res);
 
-      const notifs: MyNotification[] = res?.data?.notifications || [];
-      setNotifications(notifs);
-    } catch (error) {
-      console.log("Notification error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     const notifs: MyNotification[] = res?.data?.notifications || [];
+  //     setNotifications(notifs);
+  //   } catch (error) {
+  //     console.log("Notification error:", error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
-  fetchNotifications();
-}, []);
+//   fetchNotifications();
+// }, []);
 
-useEffect(() => {
-    const fetchNotifications = async () => {
-      setLoading(true);
-      try {
-        const res = await notificationCount();
-        setCount(res?.data?.count);
-      } catch (error: any) {
-        // toast.error(error?.message || "Failed to fetch notifications");
-      } finally {
-        setLoading(false);
-      }
-    };
+// useEffect(() => {
+//     const fetchNotifications = async () => {
+//       setLoading(true);
+//       try {
+//         const res = await notificationCount();
+//         setCount(res?.data?.count);
+//       } catch (error: any) {
+//         // toast.error(error?.message || "Failed to fetch notifications");
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
 
-    fetchNotifications();
+//     fetchNotifications();
   }, []);
 
 
