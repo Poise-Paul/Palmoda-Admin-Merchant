@@ -133,7 +133,9 @@ function page() {
             </thead>
             <tbody>
               {loading
-                ? Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)
+                ? Array.from({ length: 6 }).map((_, i) => (
+                    <SkeletonRow key={i} />
+                  ))
                 : paginatedTransactions.map((transaction) => (
                     <tr
                       key={transaction._id}
@@ -156,9 +158,13 @@ function page() {
                           <p className="text-xs">{transaction?.vendor.email}</p>
                         </div>
                       </td>
-                      <td className="py-3 px-4">{transaction?.transaction_reference}</td>
+                      <td className="py-3 px-4">
+                        {transaction?.transaction_reference}
+                      </td>
                       <td className="py-3 px-4">₦{transaction?.amount}</td>
-                      <td className="py-3 px-4">{transaction.created_at.split(" ")[0]}</td>
+                      <td className="py-3 px-4">
+                        {transaction.created_at.split(" ")[0]}
+                      </td>
                       <td className="py-3 px-4">
                         <span
                           className={`px-2 py-1 rounded text-xs font-semibold ${getStatusColor(
@@ -191,9 +197,13 @@ function page() {
               >
                 Prev
               </button>
-              <span className="px-2 py-1">{currentPage} / {totalPages}</span>
+              <span className="px-2 py-1">
+                {currentPage} / {totalPages}
+              </span>
               <button
-                onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(p + 1, totalPages))
+                }
                 disabled={currentPage === totalPages}
                 className="px-3 py-1 border rounded disabled:opacity-50"
               >
