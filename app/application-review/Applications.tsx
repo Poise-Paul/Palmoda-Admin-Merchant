@@ -3,12 +3,13 @@ import React, { useEffect, useState } from 'react'
 import { CiUser } from 'react-icons/ci'
 import Image from 'next/image' // Assuming img1, img2, img3 are local imports but not used in the final version, keeping the import for completeness
 import { Vendor, KycCompliance, Product, VendorMessage } from "@/app/_lib/type";
-import { verifyBankDetails, verifyBusiness, verifyVendorIdentity } from '../_lib/admin'
+import { verifyBankDetails, verifyBusiness, verifyVendorIdentity, revokeBankDetails, revokeBusiness, revokeVendorIdentity } from '../_lib/admin'
 import { toast } from "react-toastify";
 import Link from 'next/link'
 import {getAllVendorMessages, sendMessage} from "../_lib/message"
 import { useRouter } from 'next/navigation'
 import { FaArrowLeft } from 'react-icons/fa'
+import { button } from '@heroui/theme';
 
 // NOTE: Local image imports (img1, img2, img3) are commented out as they are not used in the products map logic.
 
@@ -27,6 +28,9 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
   const [verifyingBusiness, setVerifyingBusiness] = useState(false);
   const [verifyingIdentity, setVerifyingIdentity] = useState(false);
   const [verifyingBank, setVerifyingBank] = useState(false);
+  const [revokingBusiness, setRevokingBusiness] = useState(false);
+  const [revokingIdentity, setRevokingIdentity] = useState(false);
+  const [revokingBank, setRevokingBank] = useState(false);
   // ------------------------------------
 
   const [messages, setMessages] = useState<VendorMessage[]>([])
@@ -171,6 +175,20 @@ const handleVerifyBusiness = async () => {
     }
 };
 
+const handleRevokeBusiness = async () => {
+    // if (revokingBusiness || !vendor?.is_business_verified) return;
+    setRevokingBusiness(true);
+    try {
+        const res = await revokeBusiness(id);
+        toast.success(res.message || "Business verification revoked successfully!");
+        setVendor((prev) => prev ? { ...prev, is_business_verified: false } : prev);
+    } catch (error: any) {
+        toast.error(error.message || "Failed to revoke Business verification");
+    } finally {
+        setRevokingBusiness(false);
+    }
+};
+
 const handleVerifyIdentity = async () => {
     if (verifyingIdentity || vendor?.is_identity_verified || !isIdentityInfoPresent) return;
     setVerifyingIdentity(true);
@@ -186,6 +204,20 @@ const handleVerifyIdentity = async () => {
     }
 };
 
+const handleRevokeIdentity = async () => {
+    // if (revokingIdentity || !vendor?.is_identity_verified) return;
+    setRevokingIdentity(true);
+    try {
+        const res = await revokeVendorIdentity(id);
+        toast.success(res.message || "Identity verification revoked successfully!");
+        setVendor((prev) => prev ? { ...prev, is_identity_verified: false } : prev);
+    } catch (error: any) {
+        toast.error(error.message || "Failed to revoke Identity verification");
+    } finally {
+        setRevokingIdentity(false);
+    }
+};
+
 const handleVerifyBankDetails = async () => {
     if (verifyingBank || vendor?.is_bank_information_verified || !isBankDocPresent) return;
     setVerifyingBank(true);
@@ -198,6 +230,20 @@ const handleVerifyBankDetails = async () => {
         toast.error(error.message || "Failed to verify Bank Details");
     } finally {
         setVerifyingBank(false);
+    }
+};
+
+const handleRevokeBankDetails = async () => {
+    // if (revokingBank || !vendor?.is_bank_information_verified) return;
+    setRevokingBank(true);
+    try {
+        const res = await revokeBankDetails(id);
+        toast.success(res.message || "Bank Details verification revoked successfully!");
+        setVendor((prev) => prev ? { ...prev, is_bank_information_verified: false } : prev);
+    } catch (error: any) {
+        toast.error(error.message || "Failed to revoke Bank Details verification");
+    } finally {
+        setRevokingBank(false);
     }
 };
 
@@ -587,50 +633,85 @@ const handleMessage = async () => {
                     <div className='p-4 flex flex-col gap-3'>
 
                         {/* Business Verification Button */}
-                        <button
-                            onClick={handleVerifyBusiness}
-                            disabled={verifyingBusiness || vendor?.is_business_verified || !isBusinessDocPresent}
-                            className={`w-full py-2 px-4 text-xs font-semibold transition duration-150 ease-in-out
-                                ${vendor?.is_business_verified 
-                                    ? "bg-white text-black border border-black cursor-not-allowed" 
-                                    : !isBusinessDocPresent
-                                      ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                                      : "bg-black text-white hover:bg-gray-800"
-                                }`}
-                        >
-                            {vendor?.is_business_verified ? "Business Verified" : verifyingBusiness ? "Verifying Business..." : "Verify Business"}
-                        </button>
+                        <div className='flex items-center gap-2'>
+            <button
+              onClick={handleVerifyBusiness}
+              disabled={verifyingBusiness || vendor?.is_business_verified || !isBusinessDocPresent}
+              className={`flex-1 py-2.5 px-4 text-xs font-semibold rounded transition duration-150 ease-in-out
+                ${vendor?.is_business_verified 
+                  ? "bg-green-50 text-green-700 border border-green-300 cursor-not-allowed" 
+                  : !isBusinessDocPresent
+                    ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                    : "bg-black text-white hover:bg-gray-800"
+                }`}
+            >
+              {vendor?.is_business_verified ? "✓ Business Verified" : verifyingBusiness ? "Verifying..." : "Verify Business"}
+            </button>
+            {!vendor?.is_business_verified &&
+              <button 
+                onClick={handleRevokeBusiness}
+                disabled={revokingBusiness}
+                className='flex-1 py-2.5 px-4 text-xs font-semibold rounded
+                bg-white border border-red-400 text-red-600 hover:bg-red-50
+                transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed'>
+                {revokingBusiness ? "Revoking..." : "Revoke Business"}
+              </button>
+           }
+          </div>
 
-                        {/* Identity Verification Button */}
-                        <button
-                            onClick={handleVerifyIdentity}
-                            disabled={verifyingIdentity || vendor?.is_identity_verified || !isIdentityInfoPresent}
-                            className={`w-full py-2 px-4 text-xs font-semibold transition duration-150 ease-in-out
-                                ${vendor?.is_identity_verified 
-                                    ? "bg-white text-black border border-black cursor-not-allowed" 
-                                    : !isIdentityInfoPresent
-                                      ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                                      : "bg-black text-white hover:bg-gray-800"
-                                }`}
-                        >
-                            {vendor?.is_identity_verified ? "Identity Verified" : verifyingIdentity ? "Verifying Identity..." : "Verify Identity"}
-                        </button>
+          {/* Identity Verification */}
+          <div className='flex items-center gap-2'>
+            <button
+              onClick={handleVerifyIdentity}
+              disabled={verifyingIdentity || vendor?.is_identity_verified || !isIdentityInfoPresent}
+              className={`flex-1 py-2.5 px-4 text-xs font-semibold rounded transition duration-150 ease-in-out
+                ${vendor?.is_identity_verified 
+                  ? "bg-green-50 text-green-700 border border-green-300 cursor-not-allowed" 
+                  : !isIdentityInfoPresent
+                    ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                    : "bg-black text-white hover:bg-gray-800"
+                }`}
+            >
+              {vendor?.is_identity_verified ? "✓ Identity Verified" : verifyingIdentity ? "Verifying..." : "Verify Identity"}
+            </button>
+            {!vendor?.is_identity_verified &&
+              <button 
+                onClick={handleRevokeIdentity}
+                disabled={revokingIdentity}
+                className='flex-1 py-2.5 px-4 text-xs font-semibold rounded
+                bg-white border border-red-400 text-red-600 hover:bg-red-50
+                transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed'>
+                {revokingIdentity ? "Revoking..." : "Revoke Identity"}
+              </button>
+          }
+          </div>
 
-                        {/* Bank Verification Button */}
-                        <button
-                            onClick={handleVerifyBankDetails}
-                            disabled={verifyingBank || vendor?.is_bank_information_verified || !isBankDocPresent}
-                            className={`w-full py-2 px-4 text-xs font-semibold transition duration-150 ease-in-out
-                                ${vendor?.is_bank_information_verified 
-                                    ? "bg-white text-black border border-black cursor-not-allowed" 
-                                    : !isBankDocPresent
-                                      ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                                      : "bg-black text-white hover:bg-gray-800"
-                                }`}
-                        >
-                            {vendor?.is_bank_information_verified ? "Bank Details Verified" : verifyingBank ? "Verifying Bank Details..." : "Verify Bank Details"}
-                        </button>
-                    </div>
+          {/* Bank Verification */}
+          <div className='flex items-center gap-2'>
+            <button
+              onClick={handleVerifyBankDetails}
+              disabled={verifyingBank || vendor?.is_bank_information_verified || !isBankDocPresent}
+              className={`flex-1 py-2.5 px-4 text-xs font-semibold rounded transition duration-150 ease-in-out
+                ${vendor?.is_bank_information_verified 
+                  ? "bg-green-50 text-green-700 border border-green-300 cursor-not-allowed" 
+                  : !isBankDocPresent
+                    ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                    : "bg-black text-white hover:bg-gray-800"
+                }`}
+            >
+              {vendor?.is_bank_information_verified ? "✓ Bank Verified" : verifyingBank ? "Verifying..." : "Verify Bank Details"}
+            </button>
+            {!vendor?.is_bank_information_verified &&
+              <button 
+                onClick={handleRevokeBankDetails}
+                disabled={revokingBank}
+                className='flex-1 py-2.5 px-4 text-xs font-semibold rounded
+                bg-white border border-red-400 text-red-600 hover:bg-red-50
+                transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed'>
+                {revokingBank ? "Revoking..." : "Revoke Bank Details"}
+              </button>}
+          </div>
+          </div>
 
                     <div className='p-4 flex flex-col gap-2'>
                         {/* Final Approval Button */}
@@ -642,10 +723,10 @@ const handleMessage = async () => {
                           border-red-500 text-red-500 disbled:cursor-not-allowed hover:bg-red-50 transition duration-150'>
                          Reject Application
                         </button>
-                        <button 
+                        {/* <button 
                          disabled={true} // Use a more appropriate check here
                          className='bg-gray-200 text-gray-600 disbled:cursor-not-allowed text-xs py-2 px-4 hover:bg-gray-300 transition duration-150
-                         '>Request More Information</button>
+                         '>Request More Information</button> */}
 
                          <div className='mt-4 flex flex-col gap-3'>
                             <h1 className='text-black font-semibold text-sm'>Add Decision Note</h1>
