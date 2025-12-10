@@ -109,7 +109,10 @@ export const deleteNotification = async (id) => {
 export const notificationCount = async () => {
    try {
       const token = localStorage.getItem("token");
-    if (!token) return console.log("No token found");
+    if (!token) {
+      console.log("No token found");
+      return { data: { count: 0 } };
+    }
     const res = await axios.get(`${backendUrl}/notification/admin/unread-count`, {
       headers: {
         Authorization: `Bearer ${token}`
