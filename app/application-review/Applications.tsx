@@ -118,6 +118,7 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
   };
 
   const handleRevokeBusiness = async () => {
+    if (revokingBusiness || !vendor?.is_business_verified) return;
     setRevokingBusiness(true);
     try {
       const res = await revokeBusiness(id);
@@ -156,6 +157,7 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
   };
 
   const handleRevokeIdentity = async () => {
+    if (revokingIdentity || !vendor?.is_identity_verified) return;
     setRevokingIdentity(true);
     try {
       const res = await revokeVendorIdentity(id);
@@ -194,6 +196,7 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
   };
 
   const handleRevokeBankDetails = async () => {
+    if (revokingBank || !vendor?.is_bank_information_verified) return;
     setRevokingBank(true);
     try {
       const res = await revokeBankDetails(id);
@@ -211,8 +214,6 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
       setRevokingBank(false);
     }
   };
-
-  
 
   const handleFinalApprove = () => {
     if (
@@ -252,6 +253,8 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
       setSending(false);
     }
   };
+
+  console.log(vendor);
 
   return (
     <section>
@@ -324,14 +327,12 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
               </div>
             </div>
 
-            {/* ... Other sidebar details ... */}
             <div className="flex flex-col gap-px">
               <p className="text-gray-500 text-xs mb-0.5">Business Type</p>
               <h2 className="text-black text-sm">
                 {vendor?.kyc_compliance?.business_type || "N/A"}
               </h2>
             </div>
-            {/* ... keeping other fields same ... */}
             <div className="flex flex-col gap-1px">
               <p className="text-gray-500 text-xs mb-0.5">Website</p>
               <h2 className="text-black text-sm">
@@ -426,7 +427,6 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
                 {documents.map((doc, index) => {
                   const value =
                     vendor?.kyc_compliance?.[doc.key as keyof KycCompliance];
-                  // Safe cast because the key matches document structure
                   const docUrl = typeof value === "string" ? value : undefined;
                   const isMissing = !docUrl || docUrl.trim() === "";
 
@@ -441,9 +441,9 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
                             <button
                               onClick={() => setSelectedDoc(docUrl)}
                               title="View Document"
-                              className="text-gray-500 hover:text-black transition"
+                              className="text-gray-500 flex items-center gap-1 text-xs ml-5 hover:text-black transition"
                             >
-                              <FaEye />
+                              <FaEye /> View Document
                             </button>
                           )}
                         </div>
@@ -455,8 +455,6 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
                           {isMissing ? "Missing" : "Uploaded"}
                         </p>
                       </div>
-
-                      {/* --- CONDITIONALLY RENDER BUTTONS BASED ON DOC KEY --- */}
 
                       {/* 1. Business Registration Buttons */}
                       {doc.key === "business_registration_document" && (
@@ -483,17 +481,22 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
                                 ? "Verifying..."
                                 : "Verify Business"}
                           </button>
-                          {!vendor?.is_business_verified && (
-                            <button
-                              onClick={handleRevokeBusiness}
-                              disabled={revokingBusiness}
-                              className="flex-1 py-2.5 px-4 text-xs font-semibold rounded
-                                bg-white border border-red-400 text-red-600 hover:bg-red-50
-                                transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              {revokingBusiness ? "..." : "Revoke"}
-                            </button>
-                          )}
+                          <button
+                            onClick={handleRevokeBusiness}
+                            disabled={revokingBusiness || !vendor?.is_business_verified}
+                            className={`flex-1 py-2.5 px-4 text-xs font-semibold rounded transition duration-150 ease-in-out
+                              ${
+                                !vendor?.is_business_verified
+                                  ? "bg-red-50 text-red-400 border border-red-200 cursor-not-allowed"
+                                  : "bg-white border border-red-400 text-red-600 hover:bg-red-50"
+                              }`}
+                          >
+                            {!vendor?.is_business_verified
+                              ? "✗ Revoked"
+                              : revokingBusiness
+                                ? "Revoking..."
+                                : "Revoke"}
+                          </button>
                         </div>
                       )}
 
@@ -522,17 +525,22 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
                                 ? "Verifying..."
                                 : "Verify Identity"}
                           </button>
-                          {!vendor?.is_identity_verified && (
-                            <button
-                              onClick={handleRevokeIdentity}
-                              disabled={revokingIdentity}
-                              className="flex-1 py-2.5 px-4 text-xs font-semibold rounded
-                                bg-white border border-red-400 text-red-600 hover:bg-red-50
-                                transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              {revokingIdentity ? "..." : "Revoke"}
-                            </button>
-                          )}
+                          <button
+                            onClick={handleRevokeIdentity}
+                            disabled={revokingIdentity || !vendor?.is_identity_verified}
+                            className={`flex-1 py-2.5 px-4 text-xs font-semibold rounded transition duration-150 ease-in-out
+                              ${
+                                !vendor?.is_identity_verified
+                                  ? "bg-red-50 text-red-400 border border-red-200 cursor-not-allowed"
+                                  : "bg-white border border-red-400 text-red-600 hover:bg-red-50"
+                              }`}
+                          >
+                            {!vendor?.is_identity_verified
+                              ? "✗ Revoked"
+                              : revokingIdentity
+                                ? "Revoking..."
+                                : "Revoke"}
+                          </button>
                         </div>
                       )}
 
@@ -561,17 +569,22 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
                                 ? "Verifying..."
                                 : "Verify Bank"}
                           </button>
-                          {!vendor?.is_bank_information_verified && (
-                            <button
-                              onClick={handleRevokeBankDetails}
-                              disabled={revokingBank}
-                              className="flex-1 py-2.5 px-4 text-xs font-semibold rounded
-                                bg-white border border-red-400 text-red-600 hover:bg-red-50
-                                transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              {revokingBank ? "..." : "Revoke"}
-                            </button>
-                          )}
+                          <button
+                            onClick={handleRevokeBankDetails}
+                            disabled={revokingBank || !vendor?.is_bank_information_verified}
+                            className={`flex-1 py-2.5 px-4 text-xs font-semibold rounded transition duration-150 ease-in-out
+                              ${
+                                !vendor?.is_bank_information_verified
+                                  ? "bg-red-50 text-red-400 border border-red-200 cursor-not-allowed"
+                                  : "bg-white border border-red-400 text-red-600 hover:bg-red-50"
+                              }`}
+                          >
+                            {!vendor?.is_bank_information_verified
+                              ? " Revoked"
+                              : revokingBank
+                                ? "Revoking..."
+                                : "Revoke"}
+                          </button>
                         </div>
                       )}
                     </div>
@@ -579,48 +592,26 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
                 })}
               </div>
 
-              {/* FINAL ACTIONS SECTION (MOVED OUTSIDE THE MAP LOOP) */}
+              {/* FINAL ACTIONS SECTION */}
               <div className="p-4 flex flex-col gap-2 border-t border-gray-200 mt-2">
-                <button
-                  onClick={handleFinalApprove}
-                  className="w-full bg-black text-white py-3 px-4 text-sm font-semibold rounded hover:bg-gray-800 transition duration-150"
-                >
-                  Approve Application
-                </button>
-
-                {/* <button
-                  className="w-full bg-inherit py-2 px-4 text-xs border
-                          border-red-500 text-red-500 disabled:cursor-not-allowed hover:bg-red-50 transition duration-150"
-                >
-                  Reject Application
-                </button> */}
-
                 <div className="mt-4 flex flex-col gap-3">
-                  <div className="flex justify-between items-center">
+                  <div className="flex flex-col gap-3">
                     <h1 className="text-black font-semibold text-sm">
                       Send Vendor Message / Decision Note
                     </h1>
                     <button
                       onClick={() => setShowPopup(true)}
-                      className="text-xs underline text-blue-600"
+                      className=" bg-black w-fit text-white px-4 py-2 text-xs font-semibold"
                     >
-                      Open Compose Modal
+                      Compose Message for Vendor
                     </button>
                   </div>
-                  <textarea
-                    name=""
-                    id=""
-                    className="border border-gray-200 px-4 py-2 text-sm focus:ring-0 focus:border-black"
-                    rows={3}
-                    placeholder="Quick note..."
-                  ></textarea>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      {/* ending of application */}
 
       {/* Document Viewer Popup */}
       {selectedDoc && (
