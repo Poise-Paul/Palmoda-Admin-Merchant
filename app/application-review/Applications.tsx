@@ -14,7 +14,7 @@ import { toast } from "react-toastify";
 import Link from "next/link";
 import { getAllVendorMessages, sendMessage } from "../_lib/message";
 import { useRouter } from "next/navigation";
-import { FaArrowLeft, FaEye } from "react-icons/fa"; 
+import { FaArrowLeft, FaEye } from "react-icons/fa";
 
 interface ApplicationsProps {
   vendor: Vendor | null;
@@ -33,6 +33,11 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
   const [revokingBusiness, setRevokingBusiness] = useState(false);
   const [revokingIdentity, setRevokingIdentity] = useState(false);
   const [revokingBank, setRevokingBank] = useState(false);
+
+  // Revoked Instances
+  const [revokedBusiness, setRevokedBusiness] = useState(false);
+  const [revokedDocuments, setRevokedDocuments] = useState(false);
+  const [revokedBank, setRevokedBank] = useState(false);
 
   // --- MESSAGING STATES ---
   const [messages, setMessages] = useState<VendorMessage[]>([]);
@@ -118,7 +123,7 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
   };
 
   const handleRevokeBusiness = async () => {
-    if (revokingBusiness || !vendor?.is_business_verified) return;
+    if (revokingBusiness) return;
     setRevokingBusiness(true);
     try {
       const res = await revokeBusiness(id);
@@ -132,6 +137,7 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
       toast.error(error.message || "Failed to revoke Business verification");
     } finally {
       setRevokingBusiness(false);
+      setRevokedBusiness(true);
     }
   };
 
@@ -157,8 +163,9 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
   };
 
   const handleRevokeIdentity = async () => {
-    if (revokingIdentity || !vendor?.is_identity_verified) return;
+    if (revokingIdentity) return;
     setRevokingIdentity(true);
+
     try {
       const res = await revokeVendorIdentity(id);
       toast.success(
@@ -171,6 +178,7 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
       toast.error(error.message || "Failed to revoke Identity verification");
     } finally {
       setRevokingIdentity(false);
+      setRevokedDocuments(true);
     }
   };
 
@@ -196,7 +204,7 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
   };
 
   const handleRevokeBankDetails = async () => {
-    if (revokingBank || !vendor?.is_bank_information_verified) return;
+    if (revokingBank) return;
     setRevokingBank(true);
     try {
       const res = await revokeBankDetails(id);
@@ -212,6 +220,7 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
       );
     } finally {
       setRevokingBank(false);
+      setRevokedBank(true);
     }
   };
 
@@ -253,8 +262,6 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
       setSending(false);
     }
   };
-
-  console.log(vendor);
 
   return (
     <section>
@@ -483,15 +490,15 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
                           </button>
                           <button
                             onClick={handleRevokeBusiness}
-                            disabled={revokingBusiness || !vendor?.is_business_verified}
+                            disabled={revokingBusiness}
                             className={`flex-1 py-2.5 px-4 text-xs font-semibold rounded transition duration-150 ease-in-out
                               ${
                                 !vendor?.is_business_verified
-                                  ? "bg-red-50 text-red-400 border border-red-200 cursor-not-allowed"
+                                  ? "bg-red-50 text-red-400 border border-red-200"
                                   : "bg-white border border-red-400 text-red-600 hover:bg-red-50"
                               }`}
                           >
-                            {!vendor?.is_business_verified
+                            {!vendor?.is_business_verified && revokedBusiness
                               ? "✗ Revoked"
                               : revokingBusiness
                                 ? "Revoking..."
@@ -506,9 +513,7 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
                           <button
                             onClick={handleVerifyIdentity}
                             disabled={
-                              verifyingIdentity ||
-                              vendor?.is_identity_verified ||
-                              !isIdentityInfoPresent
+                              verifyingIdentity || !isIdentityInfoPresent
                             }
                             className={`flex-1 py-2.5 px-4 text-xs font-semibold rounded transition duration-150 ease-in-out
                               ${
@@ -527,15 +532,15 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
                           </button>
                           <button
                             onClick={handleRevokeIdentity}
-                            disabled={revokingIdentity || !vendor?.is_identity_verified}
+                            disabled={revokingIdentity}
                             className={`flex-1 py-2.5 px-4 text-xs font-semibold rounded transition duration-150 ease-in-out
                               ${
                                 !vendor?.is_identity_verified
-                                  ? "bg-red-50 text-red-400 border border-red-200 cursor-not-allowed"
+                                  ? "bg-red-50 text-red-400 border border-red-200"
                                   : "bg-white border border-red-400 text-red-600 hover:bg-red-50"
                               }`}
                           >
-                            {!vendor?.is_identity_verified
+                            {!vendor?.is_identity_verified && revokedDocuments
                               ? "✗ Revoked"
                               : revokingIdentity
                                 ? "Revoking..."
@@ -571,16 +576,17 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
                           </button>
                           <button
                             onClick={handleRevokeBankDetails}
-                            disabled={revokingBank || !vendor?.is_bank_information_verified}
+                            disabled={revokingBank}
                             className={`flex-1 py-2.5 px-4 text-xs font-semibold rounded transition duration-150 ease-in-out
                               ${
                                 !vendor?.is_bank_information_verified
-                                  ? "bg-red-50 text-red-400 border border-red-200 cursor-not-allowed"
+                                  ? "bg-red-50 text-red-400 border border-red-200"
                                   : "bg-white border border-red-400 text-red-600 hover:bg-red-50"
                               }`}
                           >
-                            {!vendor?.is_bank_information_verified
-                              ? " Revoked"
+                            {!vendor?.is_bank_information_verified &&
+                            revokedBank
+                              ? "✗ Revoked"
                               : revokingBank
                                 ? "Revoking..."
                                 : "Revoke"}

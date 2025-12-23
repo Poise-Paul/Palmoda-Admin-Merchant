@@ -397,15 +397,15 @@ export default function VendorList({
                 <th className="py-3 px-4 text-left font-semibold w-[8%]">
                   Verified Docs
                 </th>
-                <th className="py-3 px-4 text-left font-semibold w-[8%]">
+                {/* <th className="py-3 px-4 text-left font-semibold w-[8%]">
                   Products
-                </th>
-                <th className="py-3 px-4 text-left font-semibold w-[10%]">
+                </th> */}
+                {/* <th className="py-3 px-4 text-left font-semibold w-[10%]">
                   Sales MTD
-                </th>
-                <th className="py-3 px-4 text-left font-semibold w-[8%]">
+                </th> */}
+                {/* <th className="py-3 px-4 text-left font-semibold w-[8%]">
                   Rating
-                </th>
+                </th> */}
                 <th className="py-3 px-4 text-left font-semibold w-[10%]">
                   Last Activity
                 </th>
@@ -473,9 +473,9 @@ export default function VendorList({
                           ].filter(Boolean).length
                         }
                       </td>
-                      <td className="py-3 px-4">0</td>
-                      <td className="py-3 px-4">₦0</td>
-                      <td className="py-3 px-4">0</td>
+                      {/* <td className="py-3 px-4">0</td> */}
+                      {/* <td className="py-3 px-4">₦0</td> */}
+                      {/* <td className="py-3 px-4">0</td> */}
                       <td className="py-3 px-4 text-xs">{vendor.updated_at}</td>
                       <td className="py-3 px-4"></td>
                       <td className="py-3 px-4">

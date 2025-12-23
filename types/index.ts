@@ -143,3 +143,24 @@ export interface PayoutsResponse {
   };
   message: string;
 }
+
+export interface Response {
+  success: boolean;
+  message: string;
+}
+
+export type AdminData = {
+  active_vendors: number;
+  pending_verification: number;
+  total_vendors: number;
+  total_revenue: number;
+  total_orders: number;
+  filters: {
+    start_date: string;
+    end_date: string;
+  };
+};
+
+export interface AdminAnalytics extends Response {
+  data: AdminData;
+}
