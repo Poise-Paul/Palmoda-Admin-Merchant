@@ -165,8 +165,10 @@ function ProductItem({ item, vendor, categoriesArray, colorsArray, sizesArray, u
         <div className="w-full">
           <h1 className="text-sm font-semibold text-black">{item.name}</h1>
           <div className="flex items-center gap-4 my-3.5">
-            <h3 className="text-xl font-semibold text-black">₦{item.discounted_price.toLocaleString()}</h3>
-            <h4 className="text-gray-500 text-sm line-through">₦{item.cost_price.toLocaleString()}</h4>
+            <h3 className="text-xl font-semibold text-black">₦{(item.discounted_price ?? item.cost_price).toLocaleString()}</h3>
+            {item.discounted_price && item.discounted_price < item.cost_price && (
+              <h4 className="text-gray-500 text-sm line-through">₦{item.cost_price.toLocaleString()}</h4>
+            )}
           </div>
 
           {/* Product info */}

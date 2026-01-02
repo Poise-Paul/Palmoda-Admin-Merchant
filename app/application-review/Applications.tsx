@@ -398,7 +398,7 @@ function Applications({ vendor, id, products, setVendor }: ApplicationsProps) {
                       />
                       <p className="text-gray-500 text-xs">{item.name}</p>
                       <p className="text-gray-500 text-xs">
-                        NGN{item.discounted_price}
+                        NGN{(item.discounted_price ?? item.cost_price).toLocaleString()}
                       </p>
                     </div>
                   ))
